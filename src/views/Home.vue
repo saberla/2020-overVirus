@@ -106,7 +106,7 @@
             </el-table-column>
             <el-table-column
               label="省份"
-              prop="provinceName">
+              prop="countryName">
             </el-table-column>
             <el-table-column
               label="确诊"
@@ -137,7 +137,7 @@
             :data="OtherData"
             style="width: 100%">
             <el-table-column
-              prop="country"
+              prop="countryName"
               label="国家">
             </el-table-column>
             <el-table-column
@@ -182,26 +182,30 @@ export default {
   methods: {
     // 获取总览数据
     getOverAll () {
-      this.$axios.get('https://lab.isaaclin.cn/nCoV/api/overall').then(res => {
-        this.loading = false
-        this.overData = res.data.results[0]
-        this.imgUrl = res.data.results[0].dailyPics[0]
-        let date = new Date(res.data.results[0].updateTime)
-        this.updateTime = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
+      this.$axios.get('/api/overall').then(res => {
+        if (res.status === 200) {
+          this.loading = false
+          this.overData = res.data.results[0]
+          // this.imgUrl = res.data.results[0].dailyPics[0]
+          let date = new Date(res.data.results[0].updateTime)
+          this.updateTime = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
+        }
       }).catch(err => {
         this.loading = false
         console.log('发生错误：', err)
       })
     },
     getWholeCountry () {
-      this.$axios.get('https://lab.isaaclin.cn//nCoV/api/area').then(res => {
-        this.laoding = false
-        console.log(res)
-        for (let i in res.data.results) {
-          if (res.data.results[i].country === '中国') {
-            this.ChinaData.push(res.data.results[i])
-          } else {
-            this.OtherData.push(res.data.results[i])
+      this.$axios.get('/api/area').then(res => {
+        if (res.status === 200) {
+          this.loading = false
+          console.log(res)
+          for (let i in res.data.results) {
+            if (res.data.results[i].continentName === '亚洲') {
+              this.ChinaData.push(res.data.results[i])
+            } else {
+              this.OtherData.push(res.data.results[i])
+            }
           }
         }
       }).catch(err => {
